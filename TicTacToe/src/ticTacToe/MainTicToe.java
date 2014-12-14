@@ -16,9 +16,6 @@ public class MainTicToe extends GraphicsProgram {
 
 	private static final int BOXES_PER_ROW = 3;
 
-	private static final int TOP_LINE = LINE_LENGTH;
-	private static final int BOT_LINE = LINE_LENGTH * 2;
-
 	public void run() {
 		createBoard();
 		addMouseListeners();
@@ -31,88 +28,60 @@ public class MainTicToe extends GraphicsProgram {
 	}
 
 	private void makeLines() {
-		int arraySetter = 0;
-		for (int j = 0; j < 3; j++) {
-			for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < BOXES_PER_ROW; j++) {
+			for (int i = 0; i < BOXES_PER_ROW; i++) {
 				GRect square = new GRect(LINE_LENGTH * i, LINE_LENGTH * j,
 						LINE_LENGTH, LINE_LENGTH);
 				add(square);
 
-				switch (arraySetter) {
-				case 0:
-					a[i] = square;
-					break;
-				case 1:
-					b[i] = square;
-					break;
-				case 2:
-					c[i] = square;
-					break;
-				default:
-					break;
-				}
+				board[j][i] = square;
 			}
-			arraySetter++;
 		}
 	}
 
 	public void mouseClicked(MouseEvent e) {
 		GObject clickedRect = getElementAt(e.getX(), e.getY());
 		GObject clicked = null;
-		for (int i = 0; i < BOXES_PER_ROW; i++) {
-			if (e.getY() < TOP_LINE && clickedRect == a[i]) {
-				clicked = a[i];
-				a[i] = null;
+		
+		int i = 0, j = 0;
+		// i tracks the row, j tracks the column
 
-				if (playerTurn) {
-					topXO[i] = 1;
-				} else {
-					topXO[i] = 2;
-				}
-			}
+		for (i = 0; i < BOXES_PER_ROW; i++) {
+			for (j = 0; j < BOXES_PER_ROW; j++) {
+				if (board[i][j] == clickedRect) {
+					clicked = board[i][j];
+					// temporarily track the clicked rectangle
 
-			if ((e.getY() > TOP_LINE && e.getY() < BOT_LINE)
-					&& clickedRect == b[i]) {
-				clicked = b[i];
-				b[i] = null;
-
-				if (playerTurn) {
-					midXO[i] = 1;
-				} else {
-					midXO[i] = 2;
-				}
-			}
-
-			if (e.getY() > BOT_LINE && clickedRect == c[i]) {
-				clicked = c[i];
-				c[i] = null;
-
-				if (playerTurn) {
-					botXO[i] = 1;
-				} else {
-					botXO[i] = 2;
+					board[i][j] = null;
+					// set the clicked rectangle null for 
+					// future attempts to place an x/o in
+					// the rectangle
 				}
 			}
 		}
 
+		// if the square has already been clicked and had a x/o placed there,
+		// clicked will be null
 		if (playerTurn && clicked != null) {
 			placeX(clickedRect.getX(), clickedRect.getY());
-			spaceRemaining--;
+			boxesRemaining--;
+			xOTracker[i][j] = 1;
 		} else if (clicked != null) {
 			// eventually do the computer move
 			placeO(clickedRect.getX(), clickedRect.getY());
-			spaceRemaining--;
+			boxesRemaining--;
+			xOTracker[i][j] = 2;
 		}
 
 		if (checkWin()) {
 			GLabel win = new GLabel("Win");
-			win.setLocation(getWidth()/ 2, getHeight()/ 2);
-			
+			win.setLocation(getWidth() / 2, getHeight() / 2);
+
 			add(win);
-		} else if (spaceRemaining == 0) {
+		} else if (boxesRemaining == 0) {
 			GLabel tie = new GLabel("Game Over");
 			tie.setLocation(getWidth() / 2, getHeight() / 2);
-			
+
 			add(tie);
 		}
 
@@ -141,16 +110,20 @@ public class MainTicToe extends GraphicsProgram {
 	}
 
 	private boolean checkWin() {
-		if (checkHorizontal() || checkVertical() || checkDiagonal()) return true;
+		if (checkHorizontal() || checkVertical() || checkDiagonal())
+			return true;
 
 		return false;
 	}
 
 	private boolean checkHorizontal() {
 		for (int k = 0; k < BOXES_PER_ROW; k++) {
-			if (k == 0 && topXO[0] == 1 && topXO[1] == 1 && topXO[2] == 1) return true;
-			if (k == 1 && midXO[0] == 1 && midXO[1] == 1 && midXO[2] == 1) return true;
-			if (k == 2 && botXO[0] == 1 && botXO[1] == 1 && botXO[2] == 1) return true;
+			if (k == 0 && topXO[0] == 1 && topXO[1] == 1 && topXO[2] == 1)
+				return true;
+			if (k == 1 && midXO[0] == 1 && midXO[1] == 1 && midXO[2] == 1)
+				return true;
+			if (k == 2 && botXO[0] == 1 && botXO[1] == 1 && botXO[2] == 1)
+				return true;
 		}
 
 		return false;
@@ -158,26 +131,31 @@ public class MainTicToe extends GraphicsProgram {
 
 	private boolean checkVertical() {
 		for (int k = 0; k < BOXES_PER_ROW; k++) {
-			if (k == 0 && topXO[0] == 1 && midXO[0] == 1 && botXO[0] == 1) return true;
-			if (k == 1 && topXO[1] == 1 && midXO[1] == 1 && botXO[1] == 1) return true;
-			if (k == 2 && topXO[2] == 1 && midXO[2] == 1 && botXO[2] == 1) return true;
+			if (k == 0 && topXO[0] == 1 && midXO[0] == 1 && botXO[0] == 1)
+				return true;
+			if (k == 1 && topXO[1] == 1 && midXO[1] == 1 && botXO[1] == 1)
+				return true;
+			if (k == 2 && topXO[2] == 1 && midXO[2] == 1 && botXO[2] == 1)
+				return true;
 		}
 
 		return false;
 	}
 
 	private boolean checkDiagonal() {
-		if (topXO[0] == 1 && midXO[1] == 1 && botXO[2] == 1) return true;
-		if (topXO[2] == 1 && midXO[1] == 1 && botXO[0] == 1) return true;
+		if (topXO[0] == 1 && midXO[1] == 1 && botXO[2] == 1)
+			return true;
+		if (topXO[2] == 1 && midXO[1] == 1 && botXO[0] == 1)
+			return true;
 
 		return false;
 	}
 
 	private boolean playerTurn = true;
-	private int spaceRemaining = 9;
-	private GObject[] a = new GObject[BOXES_PER_ROW];
-	private GObject[] b = new GObject[BOXES_PER_ROW];
-	private GObject[] c = new GObject[BOXES_PER_ROW];
+	private int boxesRemaining = 9;
+
+	private GObject[][] board = new GObject[BOXES_PER_ROW][BOXES_PER_ROW];
+	private int[][] xOTracker = new int[BOXES_PER_ROW][BOXES_PER_ROW];
 
 	private int[] topXO = new int[BOXES_PER_ROW];
 	private int[] midXO = new int[BOXES_PER_ROW];
