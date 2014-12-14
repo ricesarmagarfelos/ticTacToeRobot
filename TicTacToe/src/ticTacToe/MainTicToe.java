@@ -42,20 +42,26 @@ public class MainTicToe extends GraphicsProgram {
 	public void mouseClicked(MouseEvent e) {
 		GObject clickedRect = getElementAt(e.getX(), e.getY());
 		GObject clicked = null;
-		
-		int i = 0, j = 0;
-		// i tracks the row, j tracks the column
 
-		for (i = 0; i < BOXES_PER_ROW; i++) {
-			for (j = 0; j < BOXES_PER_ROW; j++) {
+		// i tracks rows, j tracks columns
+		for (int i = 0; i < BOXES_PER_ROW; i++) {
+			for (int j = 0; j < BOXES_PER_ROW; j++) {
 				if (board[i][j] == clickedRect) {
 					clicked = board[i][j];
 					// temporarily track the clicked rectangle
 
 					board[i][j] = null;
-					// set the clicked rectangle null for 
+					// set the clicked rectangle null for
 					// future attempts to place an x/o in
 					// the rectangle
+					
+					if (playerTurn) {
+						xOTracker[i][j] = 1;
+						// 1 is for X
+					} else {
+						xOTracker[i][j] = 2;
+						// 2 is for O
+					}
 				}
 			}
 		}
@@ -65,12 +71,10 @@ public class MainTicToe extends GraphicsProgram {
 		if (playerTurn && clicked != null) {
 			placeX(clickedRect.getX(), clickedRect.getY());
 			boxesRemaining--;
-			xOTracker[i][j] = 1;
 		} else if (clicked != null) {
 			// eventually do the computer move
 			placeO(clickedRect.getX(), clickedRect.getY());
 			boxesRemaining--;
-			xOTracker[i][j] = 2;
 		}
 
 		if (checkWin()) {
@@ -118,11 +122,9 @@ public class MainTicToe extends GraphicsProgram {
 
 	private boolean checkHorizontal() {
 		for (int k = 0; k < BOXES_PER_ROW; k++) {
-			if (k == 0 && topXO[0] == 1 && topXO[1] == 1 && topXO[2] == 1)
-				return true;
-			if (k == 1 && midXO[0] == 1 && midXO[1] == 1 && midXO[2] == 1)
-				return true;
-			if (k == 2 && botXO[0] == 1 && botXO[1] == 1 && botXO[2] == 1)
+			if (xOTracker[k][0] == 1 && 
+				xOTracker[k][1] == 1 &&
+				xOTracker[k][2] == 1)
 				return true;
 		}
 
@@ -131,11 +133,9 @@ public class MainTicToe extends GraphicsProgram {
 
 	private boolean checkVertical() {
 		for (int k = 0; k < BOXES_PER_ROW; k++) {
-			if (k == 0 && topXO[0] == 1 && midXO[0] == 1 && botXO[0] == 1)
-				return true;
-			if (k == 1 && topXO[1] == 1 && midXO[1] == 1 && botXO[1] == 1)
-				return true;
-			if (k == 2 && topXO[2] == 1 && midXO[2] == 1 && botXO[2] == 1)
+			if (xOTracker[0][k] == 1 &&
+				xOTracker[1][k] == 1 &&
+				xOTracker[2][k] == 1)
 				return true;
 		}
 
@@ -143,10 +143,11 @@ public class MainTicToe extends GraphicsProgram {
 	}
 
 	private boolean checkDiagonal() {
-		if (topXO[0] == 1 && midXO[1] == 1 && botXO[2] == 1)
-			return true;
-		if (topXO[2] == 1 && midXO[1] == 1 && botXO[0] == 1)
-			return true;
+		if (xOTracker[0][0] == 1 && xOTracker[1][1] == 1 && xOTracker[2][2] == 1) return true;
+		// top-left to bottom-right
+		
+		if (xOTracker[2][0] == 1 && xOTracker[1][1] == 1 && xOTracker[0][2] == 1) return true;
+		// bottom-left to top-right
 
 		return false;
 	}
@@ -156,9 +157,4 @@ public class MainTicToe extends GraphicsProgram {
 
 	private GObject[][] board = new GObject[BOXES_PER_ROW][BOXES_PER_ROW];
 	private int[][] xOTracker = new int[BOXES_PER_ROW][BOXES_PER_ROW];
-
-	private int[] topXO = new int[BOXES_PER_ROW];
-	private int[] midXO = new int[BOXES_PER_ROW];
-	private int[] botXO = new int[BOXES_PER_ROW];
-	// 1 is for X, 2 is for O, default 0 is empty box
 }
