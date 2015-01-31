@@ -15,6 +15,8 @@ public class MainTicToe extends GraphicsProgram {
 	private static final int XO_LENGTH = LINE_LENGTH / 2;
 
 	private static final int BOXES_PER_ROW = 3;
+	
+	TBot bot = new TBot();
 
 	public void run() {
 		createBoard();
@@ -73,6 +75,7 @@ public class MainTicToe extends GraphicsProgram {
 			boxesRemaining--;
 		} else if (clicked != null) {
 			// eventually do the computer move
+			// this will change to be part of the playerClick as a response
 			placeO(clickedRect.getX(), clickedRect.getY());
 			boxesRemaining--;
 		}
@@ -80,12 +83,10 @@ public class MainTicToe extends GraphicsProgram {
 		if (checkWin()) {
 			GLabel win = new GLabel("Win");
 			win.setLocation(getWidth() / 2, getHeight() / 2);
-
 			add(win);
 		} else if (boxesRemaining == 0) {
 			GLabel tie = new GLabel("Game Over");
 			tie.setLocation(getWidth() / 2, getHeight() / 2);
-
 			add(tie);
 		}
 
@@ -114,10 +115,7 @@ public class MainTicToe extends GraphicsProgram {
 	}
 
 	private boolean checkWin() {
-		if (checkHorizontal() || checkVertical() || checkDiagonal())
-			return true;
-
-		return false;
+		return (checkHorizontal() || checkVertical() || checkDiagonal());
 	}
 
 	private boolean checkHorizontal() {
